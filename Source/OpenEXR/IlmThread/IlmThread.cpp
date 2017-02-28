@@ -64,7 +64,6 @@ Thread::Thread ()
 
 Thread::~Thread ()
 {
-    throw IEX_NAMESPACE::NoImplExc ("Threads not supported on this platform.");
 }
 
 

@@ -42,7 +42,6 @@
 #include "../OpenEXR/Half/half.h"
 
 #include "FreeImageIO.h"
-#include "PSDParser.h"
 
 // --------------------------------------------------------------------------
 // GeoTIFF profile (see XTIFF.cpp)
@@ -1283,9 +1282,9 @@ ReadThumbnail(FreeImageIO *io, fi_handle handle, void *data, TIFF *tiff, FIBITMA
 			}
 		}
 	}
-	
+
+#if 0
 	// ... or read Photoshop thumbnail
-	
 	if(!thumbnail) {
 		uint32 ps_size = 0;
 		void *ps_data = NULL;
@@ -1304,7 +1303,8 @@ ReadThumbnail(FreeImageIO *io, fi_handle handle, void *data, TIFF *tiff, FIBITMA
 			FreeImage_CloseMemory(handle);
 		}
 	}
-	
+#endif
+
 	// release thumbnail
 	FreeImage_Unload(thumbnail);
 }

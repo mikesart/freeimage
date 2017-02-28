@@ -3,7 +3,7 @@
 //
 // Design and implementation by
 // - Floris van den Berg (flvdberg@wxs.nl)
-// - Hervé Drolon (drolon@infonie.fr)
+// - HervÃ© Drolon (drolon@infonie.fr)
 // - Jani Kajala (janik@remedy.fi)
 // - Karl-Heinz Bussian (khbussian@moss.de)
 // - Carsten Klein (cklein05@users.sourceforge.net)
@@ -30,13 +30,13 @@
 //  internal conversions X to 8 bits
 // ----------------------------------------------------------
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine1To8(BYTE *target, BYTE *source, int width_in_pixels) {
 	for (unsigned cols = 0; cols < (unsigned)width_in_pixels; cols++)
 		target[cols] = (source[cols >> 3] & (0x80 >> (cols & 0x07))) != 0 ? 255 : 0;	
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine4To8(BYTE *target, BYTE *source, int width_in_pixels) {
 	unsigned count_new = 0;
 	unsigned count_org = 0;
@@ -54,7 +54,7 @@ FreeImage_ConvertLine4To8(BYTE *target, BYTE *source, int width_in_pixels) {
 	}
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine16To8_555(BYTE *target, BYTE *source, int width_in_pixels) {
 	const WORD *const bits = (WORD *)source;
 	for (unsigned cols = 0; cols < (unsigned)width_in_pixels; cols++) {
@@ -64,7 +64,7 @@ FreeImage_ConvertLine16To8_555(BYTE *target, BYTE *source, int width_in_pixels) 
 	}
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine16To8_565(BYTE *target, BYTE *source, int width_in_pixels) {
 	const WORD *const bits = (WORD *)source;
 	for (unsigned cols = 0; cols < (unsigned)width_in_pixels; cols++) {
@@ -74,7 +74,7 @@ FreeImage_ConvertLine16To8_565(BYTE *target, BYTE *source, int width_in_pixels) 
 	}
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine24To8(BYTE *target, BYTE *source, int width_in_pixels) {
 	for (unsigned cols = 0; cols < (unsigned)width_in_pixels; cols++) {
 		target[cols] = GREY(source[FI_RGBA_RED], source[FI_RGBA_GREEN], source[FI_RGBA_BLUE]);
@@ -82,7 +82,7 @@ FreeImage_ConvertLine24To8(BYTE *target, BYTE *source, int width_in_pixels) {
 	}
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine32To8(BYTE *target, BYTE *source, int width_in_pixels) {
 	for (unsigned cols = 0; cols < (unsigned)width_in_pixels; cols++) {
 		target[cols] = GREY(source[FI_RGBA_RED], source[FI_RGBA_GREEN], source[FI_RGBA_BLUE]);
@@ -94,7 +94,7 @@ FreeImage_ConvertLine32To8(BYTE *target, BYTE *source, int width_in_pixels) {
 //   smart convert X to 8 bits
 // ----------------------------------------------------------
 
-FIBITMAP * DLL_CALLCONV
+static FIBITMAP *
 FreeImage_ConvertTo8Bits(FIBITMAP *dib) {
 	if (!FreeImage_HasPixels(dib)) {
 		return NULL;

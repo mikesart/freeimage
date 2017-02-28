@@ -3,7 +3,7 @@
 //
 // Design and implementation by
 // - Floris van den Berg (flvdberg@wxs.nl)
-// - Hervé Drolon (drolon@infonie.fr)
+// - HervÃ© Drolon (drolon@infonie.fr)
 // - Karl-Heinz Bussian (khbussian@moss.de)
 //
 // This file is part of FreeImage 3
@@ -66,7 +66,7 @@ void FreeImage_SO_Initialise() __attribute__((constructor));
 void FreeImage_SO_DeInitialise() __attribute__((destructor));
 
 void FreeImage_SO_Initialise() {
-  FreeImage_Initialise(FALSE);
+  FreeImage_Initialise();
 }
 
 void FreeImage_SO_DeInitialise() {
@@ -88,18 +88,6 @@ FreeImage_GetVersion() {
 const char * DLL_CALLCONV
 FreeImage_GetCopyrightMessage() {
 	return s_copyright;
-}
-
-//----------------------------------------------------------------------
-
-BOOL DLL_CALLCONV
-FreeImage_IsLittleEndian() {
-	union {
-		DWORD i;
-		BYTE c[4];
-	} u;
-	u.i = 1;
-	return (u.c[0] != 0);
 }
 
 //----------------------------------------------------------------------

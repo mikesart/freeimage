@@ -2,7 +2,7 @@
 // High Dynamic Range bitmap conversion routines
 //
 // Design and implementation by
-// - Hervé Drolon (drolon@infonie.fr)
+// - HervÃ© Drolon (drolon@infonie.fr)
 // - Mihail Naydenov (mnaydenov@users.sourceforge.net)
 //
 // This file is part of FreeImage 3
@@ -22,7 +22,6 @@
 
 #include "FreeImage.h"
 #include "Utilities.h"
-#include "ToneMapping.h"
 
 // ----------------------------------------------------------
 // Convert RGB to and from Yxy, same as in Reinhard et al. SIGGRAPH 2002

@@ -4,7 +4,7 @@
 // Design and implementation by
 // - Floris van den Berg (flvdberg@wxs.nl)
 // - Dale Larson (dlarson@norsesoft.com)
-// - Hervé Drolon (drolon@infonie.fr)
+// - HervÃ© Drolon (drolon@infonie.fr)
 // - Jani Kajala (janik@remedy.fi)
 //
 // This file is part of FreeImage 3
@@ -29,7 +29,7 @@
 //  internal conversions X to 24 bits
 // ----------------------------------------------------------
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine1To24(BYTE *target, BYTE *source, int width_in_pixels, RGBQUAD *palette) {
 	for (int cols = 0; cols < width_in_pixels; cols++) {
 		BYTE index = (source[cols >> 3] & (0x80 >> (cols & 0x07))) != 0 ? 1 : 0;
@@ -42,7 +42,7 @@ FreeImage_ConvertLine1To24(BYTE *target, BYTE *source, int width_in_pixels, RGBQ
 	}
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine4To24(BYTE *target, BYTE *source, int width_in_pixels, RGBQUAD *palette) {
 	BOOL low_nibble = FALSE;
 	int x = 0;
@@ -77,7 +77,7 @@ FreeImage_ConvertLine8To24(BYTE *target, BYTE *source, int width_in_pixels, RGBQ
 	}
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine16To24_555(BYTE *target, BYTE *source, int width_in_pixels) {
 	WORD *bits = (WORD *)source;
 
@@ -90,17 +90,17 @@ FreeImage_ConvertLine16To24_555(BYTE *target, BYTE *source, int width_in_pixels)
 	}
 }
 
-void DLL_CALLCONV
+static void
 FreeImage_ConvertLine16To24_565(BYTE *target, BYTE *source, int width_in_pixels) {
-	WORD *bits = (WORD *)source;
+    WORD *bits = (WORD *)source;
 
-	for (int cols = 0; cols < width_in_pixels; cols++) {
-		target[FI_RGBA_RED]   = (BYTE)((((bits[cols] & FI16_565_RED_MASK) >> FI16_565_RED_SHIFT) * 0xFF) / 0x1F);
-		target[FI_RGBA_GREEN] = (BYTE)((((bits[cols] & FI16_565_GREEN_MASK) >> FI16_565_GREEN_SHIFT) * 0xFF) / 0x3F);
-		target[FI_RGBA_BLUE]  = (BYTE)((((bits[cols] & FI16_565_BLUE_MASK) >> FI16_565_BLUE_SHIFT) * 0xFF) / 0x1F);
+    for (int cols = 0; cols < width_in_pixels; cols++) {
+        target[FI_RGBA_RED]   = (BYTE)((((bits[cols] & FI16_565_RED_MASK) >> FI16_565_RED_SHIFT) * 0xFF) / 0x1F);
+        target[FI_RGBA_GREEN] = (BYTE)((((bits[cols] & FI16_565_GREEN_MASK) >> FI16_565_GREEN_SHIFT) * 0xFF) / 0x3F);
+        target[FI_RGBA_BLUE]  = (BYTE)((((bits[cols] & FI16_565_BLUE_MASK) >> FI16_565_BLUE_SHIFT) * 0xFF) / 0x1F);
 
-		target += 3;
-	}
+        target += 3;
+    }
 }
 
 void DLL_CALLCONV

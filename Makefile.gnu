@@ -18,14 +18,9 @@ MODULES := $(MODULES:.cpp=.o)
 CFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden
 # OpenJPEG
 CFLAGS += -DOPJ_STATIC
-# LibRaw
-CFLAGS += -DNO_LCMS
-# LibJXR
-CFLAGS += -DDISABLE_PERF_MEASUREMENT -D__ANSI__
+CFLAGS += -DHAVE_UNISTD_H -DHAVE_STDARG_H
 CFLAGS += $(INCLUDE)
 CXXFLAGS ?= -O3 -fPIC -fexceptions -fvisibility=hidden -Wno-ctor-dtor-privacy
-# LibJXR
-CXXFLAGS += -D__ANSI__
 CXXFLAGS += $(INCLUDE)
 
 ifeq ($(shell sh -c 'uname -m 2>/dev/null || echo not'),x86_64)
@@ -80,4 +75,4 @@ install:
 
 clean:
 	rm -f core Dist/*.* u2dtmp* $(MODULES) $(STATICLIB) $(SHAREDLIB) $(LIBNAME)
-
+	touch Dist/delete.me

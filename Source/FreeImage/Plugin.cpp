@@ -44,17 +44,6 @@
 
 using namespace std;
 
-// =====================================================================
-// Plugin search list
-// =====================================================================
-
-const char *
-s_search_list[] = {
-	"",
-	"plugins\\",
-};
-
-static int s_search_list_size = sizeof(s_search_list) / sizeof(char *);
 static PluginList *s_plugins = NULL;
 static int s_plugin_reference_count = 0;
 
@@ -216,7 +205,7 @@ FreeImage_GetPluginList() {
 // =====================================================================
 
 void DLL_CALLCONV
-FreeImage_Initialise(BOOL load_local_plugins_only) {
+FreeImage_Initialise() {
 	if (s_plugin_reference_count++ == 0) {
 		
 		/*
@@ -236,109 +225,15 @@ FreeImage_Initialise(BOOL load_local_plugins_only) {
 			The order used to initialize internal plugins below MUST BE the same order 
 			as the one used to define the FREE_IMAGE_FORMAT enum. 
 			*/
-			s_plugins->AddNode(InitBMP);
-			s_plugins->AddNode(InitICO);
-			s_plugins->AddNode(InitJPEG);
-			s_plugins->AddNode(InitJNG);
-			s_plugins->AddNode(InitKOALA);
-			s_plugins->AddNode(InitIFF);
-			s_plugins->AddNode(InitMNG);
-			s_plugins->AddNode(InitPNM, NULL, "PBM", "Portable Bitmap (ASCII)", "pbm", "^P1");
-			s_plugins->AddNode(InitPNM, NULL, "PBMRAW", "Portable Bitmap (RAW)", "pbm", "^P4");
-			s_plugins->AddNode(InitPCD);
-			s_plugins->AddNode(InitPCX);
-			s_plugins->AddNode(InitPNM, NULL, "PGM", "Portable Greymap (ASCII)", "pgm", "^P2");
-			s_plugins->AddNode(InitPNM, NULL, "PGMRAW", "Portable Greymap (RAW)", "pgm", "^P5");
-			s_plugins->AddNode(InitPNG);
-			s_plugins->AddNode(InitPNM, NULL, "PPM", "Portable Pixelmap (ASCII)", "ppm", "^P3");
-			s_plugins->AddNode(InitPNM, NULL, "PPMRAW", "Portable Pixelmap (RAW)", "ppm", "^P6");
-			s_plugins->AddNode(InitRAS);
-			s_plugins->AddNode(InitTARGA);
-			s_plugins->AddNode(InitTIFF);
-			s_plugins->AddNode(InitWBMP);
-			s_plugins->AddNode(InitPSD);
-			s_plugins->AddNode(InitCUT);
-			s_plugins->AddNode(InitXBM);
-			s_plugins->AddNode(InitXPM);
-			s_plugins->AddNode(InitDDS);
-	        s_plugins->AddNode(InitGIF);
-	        s_plugins->AddNode(InitHDR);
-			s_plugins->AddNode(InitG3);
-			s_plugins->AddNode(InitSGI);
-			s_plugins->AddNode(InitEXR);
-			s_plugins->AddNode(InitJ2K);
-			s_plugins->AddNode(InitJP2);
-			s_plugins->AddNode(InitPFM);
-			s_plugins->AddNode(InitPICT);
-			s_plugins->AddNode(InitRAW);
-			s_plugins->AddNode(InitWEBP);
-#if !(defined(_MSC_VER) && (_MSC_VER <= 1310))
-			s_plugins->AddNode(InitJXR);
-#endif // unsupported by MS Visual Studio 2003 !!!
-			
-			// external plugin initialization
-
-#ifdef _WIN32
-			if (!load_local_plugins_only) {
-				int count = 0;
-				char buffer[MAX_PATH + 200];
-				wchar_t current_dir[2 * _MAX_PATH], module[2 * _MAX_PATH];
-				BOOL bOk = FALSE;
-
-				// store the current directory. then set the directory to the application location
-
-				if (GetCurrentDirectoryW(2 * _MAX_PATH, current_dir) != 0) {
-					if (GetModuleFileNameW(NULL, module, 2 * _MAX_PATH) != 0) {
-						wchar_t *last_point = wcsrchr(module, L'\\');
-
-						if (last_point) {
-							*last_point = L'\0';
-
-							bOk = SetCurrentDirectoryW(module);
-						}
-					}
-				}
-
-				// search for plugins
-
-				while (count < s_search_list_size) {
-					_finddata_t find_data;
-					long find_handle;
-
-					strcpy(buffer, s_search_list[count]);
-					strcat(buffer, "*.fip");
-
-					if ((find_handle = (long)_findfirst(buffer, &find_data)) != -1L) {
-						do {
-							strcpy(buffer, s_search_list[count]);
-							strncat(buffer, find_data.name, MAX_PATH + 200);
-
-							HINSTANCE instance = LoadLibrary(buffer);
-
-							if (instance != NULL) {
-								FARPROC proc_address = GetProcAddress(instance, "_Init@8");
-
-								if (proc_address != NULL) {
-									s_plugins->AddNode((FI_InitProc)proc_address, (void *)instance);
-								} else {
-									FreeLibrary(instance);
-								}
-							}
-						} while (_findnext(find_handle, &find_data) != -1L);
-
-						_findclose(find_handle);
-					}
-
-					count++;
-				}
-
-				// restore the current directory
-
-				if (bOk) {
-					SetCurrentDirectoryW(current_dir);
-				}
-			}
-#endif // _WIN32
+            s_plugins->AddNode(InitBMP); // bmp
+            s_plugins->AddNode(InitJPEG); // jpg,jif,jpeg,jpe
+            s_plugins->AddNode(InitPNG); // png
+            s_plugins->AddNode(InitTARGA); // tga,targa
+            s_plugins->AddNode(InitTIFF); // tif,tiff
+            s_plugins->AddNode(InitHDR); // hdr
+            s_plugins->AddNode(InitEXR); // exr
+            s_plugins->AddNode(InitJ2K); // j2k,j2c
+            s_plugins->AddNode(InitJP2); // jp2
 		}
 	}
 }
@@ -506,65 +401,6 @@ FreeImage_SaveU(FREE_IMAGE_FORMAT fif, FIBITMAP *dib, const wchar_t *filename, i
 }
 
 // =====================================================================
-// Plugin construction + enable/disable functions
-// =====================================================================
-
-FREE_IMAGE_FORMAT DLL_CALLCONV
-FreeImage_RegisterLocalPlugin(FI_InitProc proc_address, const char *format, const char *description, const char *extension, const char *regexpr) {
-	return s_plugins->AddNode(proc_address, NULL, format, description, extension, regexpr);
-}
-
-#ifdef _WIN32
-FREE_IMAGE_FORMAT DLL_CALLCONV
-FreeImage_RegisterExternalPlugin(const char *path, const char *format, const char *description, const char *extension, const char *regexpr) {
-	if (path != NULL) {
-		HINSTANCE instance = LoadLibrary(path);
-
-		if (instance != NULL) {
-			FARPROC proc_address = GetProcAddress(instance, "_Init@8");
-
-			FREE_IMAGE_FORMAT result = s_plugins->AddNode((FI_InitProc)proc_address, (void *)instance, format, description, extension, regexpr);
-
-			if (result == FIF_UNKNOWN)
-				FreeLibrary(instance);
-
-			return result;
-		}
-	}
-
-	return FIF_UNKNOWN;
-}
-#endif // _WIN32
-
-int DLL_CALLCONV
-FreeImage_SetPluginEnabled(FREE_IMAGE_FORMAT fif, BOOL enable) {
-	if (s_plugins != NULL) {
-		PluginNode *node = s_plugins->FindNodeFromFIF(fif);
-
-		if (node != NULL) {
-			BOOL previous_state = node->m_enabled;
-
-			node->m_enabled = enable;
-
-			return previous_state;
-		}
-	}
-
-	return -1;
-}
-
-int DLL_CALLCONV
-FreeImage_IsPluginEnabled(FREE_IMAGE_FORMAT fif) {
-	if (s_plugins != NULL) {
-		PluginNode *node = s_plugins->FindNodeFromFIF(fif);
-
-		return (node != NULL) ? node->m_enabled : FALSE;
-	}
-	
-	return -1;
-}
-
-// =====================================================================
 // Plugin Access Functions
 // =====================================================================
 
@@ -648,28 +484,6 @@ FreeImage_GetFIFRegExpr(FREE_IMAGE_FORMAT fif) {
 	}
 
 	return NULL;
-}
-
-BOOL DLL_CALLCONV
-FreeImage_FIFSupportsReading(FREE_IMAGE_FORMAT fif) {
-	if (s_plugins != NULL) {
-		PluginNode *node = s_plugins->FindNodeFromFIF(fif);
-
-		return (node != NULL) ? node->m_plugin->load_proc != NULL : FALSE;
-	}
-
-	return FALSE;
-}
-
-BOOL DLL_CALLCONV
-FreeImage_FIFSupportsWriting(FREE_IMAGE_FORMAT fif) {
-	if (s_plugins != NULL) {
-		PluginNode *node = s_plugins->FindNodeFromFIF(fif);
-
-		return (node != NULL) ? node->m_plugin->save_proc != NULL : FALSE ;
-	}
-
-	return FALSE;
 }
 
 BOOL DLL_CALLCONV
